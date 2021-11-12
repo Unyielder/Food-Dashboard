@@ -2,8 +2,14 @@ import streamlit as st
 import altair as alt
 from load_data import df
 
-
-st.title("Food Groups")
+st.markdown(
+    """
+    <h1 style='text-align: center;'>
+        Canadian Foods Dashboard
+    </h1>
+    <br><br>
+    """,unsafe_allow_html=True
+)
 
 col1, col2 = st.columns([3, 1])
 
