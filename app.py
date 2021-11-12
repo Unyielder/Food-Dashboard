@@ -1,16 +1,17 @@
-import pandas as pd
 import streamlit as st
 import altair as alt
 from load_data import df
 
-df_nutri = None
 
 st.title("Food Groups")
 
-macro_select = st.radio(
-    "Select macro:",
-    ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre')
-)
+col1, col2 = st.columns([3, 1])
+
+with col2:
+    macro_select = st.radio(
+        "Select macro:",
+        ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre')
+    )
 if macro_select == 'Calories':
     df_nutri = df[df['NutrientName'] == 'Calories']
     df_nutri = df_nutri.groupby('FoodGroupName').mean()['NutrientValue'].sort_values(ascending=False).reset_index()
@@ -39,5 +40,6 @@ barchart = alt.Chart(df_nutri).mark_bar().encode(
     width=700
 )
 
-st.write(barchart)
+with col1:
+    st.write(barchart)
 
