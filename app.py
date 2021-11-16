@@ -64,29 +64,33 @@ def scatter_plot(x, y, df):
 
 col3, col4 = st.columns([1, 1])
 
+food_groups = list(df['FoodGroupName'].unique())
 
 with st.form(key='my_form'):
-    with col3:
-        x_option = st.selectbox(
-            'X-axis',
-            ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre'))
-    with col4:
-        y_option = st.selectbox(
-            'Y-axis',
-            ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre'))
-    submit_button = st.form_submit_button(label='Submit')
+    x_option = st.selectbox(
+        'X-axis',
+        ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre'))
+    y_option = st.selectbox(
+        'Y-axis',
+        ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre'))
 
+
+    submit_button = st.form_submit_button(label='Submit')
     df_scatter = scatter_plot(x_option, y_option, df)
 
-scatter = alt.Chart(df_scatter).mark_circle(size=30).encode(
+selection = alt.selection_multi(fields=['FoodGroupName'], bind='legend')
+scatter = alt.Chart(df_scatter).mark_circle(size=40).encode(
     x='X',
     y='Y',
     color='FoodGroupName',
+    opacity=alt.condition(selection, alt.value(1), alt.value(0.05)),
     tooltip=['FoodDescription', 'FoodGroupName']
 ).properties(
     height=500,
     width=700
-).interactive()
+).interactive().add_selection(
+    selection
+)
 
 if x_option == 'Calories':
     scatter.encoding.x.title = f"{x_option} (kcal)"
@@ -98,6 +102,5 @@ if y_option == 'Calories':
 else:
     scatter.encoding.y.title = f"{y_option} (g)"
 
-
-
 st.altair_chart(scatter)
+
