@@ -1,6 +1,7 @@
 import streamlit as st
 import altair as alt
 from load_data import df
+import matplotlib.pyplot as plt
 
 st.markdown(
     """
@@ -45,6 +46,7 @@ barchart = alt.Chart(df_nutri).mark_bar().encode(
     height=500,
     width=700
 ).interactive()
+
 barchart.encoding.x.title = macro_select
 barchart.encoding.y.title = "Food Group"
 
@@ -66,14 +68,13 @@ col3, col4 = st.columns([1, 1])
 
 food_groups = list(df['FoodGroupName'].unique())
 
-with st.form(key='my_form'):
+with st.form(key='scatter'):
     x_option = st.selectbox(
         'X-axis',
         ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre'))
     y_option = st.selectbox(
         'Y-axis',
         ('Calories', 'Protein', 'Fats', 'Saturated fats', 'Carbs', 'Fibre'))
-
 
     submit_button = st.form_submit_button(label='Submit')
     df_scatter = scatter_plot(x_option, y_option, df)
@@ -104,3 +105,8 @@ else:
 
 st.altair_chart(scatter)
 
+code_col, or_col, name_col = st.columns([1, 0.5, 3])
+
+food_code = code_col.text_input("Food Code")
+or_col.write("Or")
+food_name = name_col.text_input("Food name")
