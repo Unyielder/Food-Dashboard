@@ -1,6 +1,6 @@
 import streamlit as st
 import altair as alt
-from load_data import df
+from load_data import df, df_piv
 import matplotlib.pyplot as plt
 
 st.markdown(
@@ -53,7 +53,7 @@ barchart.encoding.y.title = "Food Group"
 with col1:
     st.altair_chart(barchart)
 
-
+@st.cache(allow_output_mutation=True)
 def scatter_plot(x, y, df):
     x_df = df[df['NutrientName'] == x][['FoodID', 'FoodGroupName', 'FoodDescription', 'NutrientValue']]
     y_df = df[df['NutrientName'] == y][['FoodID', 'NutrientValue']]
@@ -105,8 +105,36 @@ else:
 
 st.altair_chart(scatter)
 
-code_col, or_col, name_col = st.columns([1, 0.5, 3])
+id_col, or_col, name_col = st.columns([1, 0.5, 3])
 
-food_code = code_col.text_input("Food Code")
+food_id = id_col.text_input("Food ID")
 or_col.write("Or")
 food_name = name_col.text_input("Food name")
+
+if food_id:
+    df_select = df_piv[df_piv['FoodID'] == int(food_id)].reset_index()
+    if df_select.empty:
+        st.write("Food ID doesn't exist, please try another one.")
+    else:
+        food_name = df_select.at[0, 'FoodDescription']
+        food_group = df_select.at[0, 'FoodGroupName']
+        protein = df_select.at[0, 'Protein']
+        carbs = df_select.at[0, 'Carbs']
+        fats = df_select.at[0, 'Fats']
+        sat_fats = df_select.at[0, 'Saturated Fats']
+        fibre = df_select.at[0, 'Fibre']
+        calories = df_select.at[0, 'Calories']
+
+        st.markdown(
+            f"""
+            <h2>{food_name}</h2>
+            <h4>Food Group: {food_group}</h4>
+            <ul style='list-style-type: none;'>
+                <li>Calories: {calories}</li>
+                <li>Carbs: {carbs}</li>
+                <li>Protein: {protein}</li>
+                <li>Fats: {fats}</li>
+                <li>Saturated Fats: {sat_fats}</li>
+                <li>Fibre: {fibre}</li>
+            </ul>
+            """, unsafe_allow_html=True)

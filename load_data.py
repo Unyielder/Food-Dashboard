@@ -46,3 +46,10 @@ def category_cleanup(cat):
 
 df = load_data()
 df['NutrientName'] = df['NutrientName'].apply(lambda x: category_cleanup(x))
+
+df_piv = df.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
+df_piv.reset_index(drop=False, inplace=True)
+df_piv = df_piv.reindex([
+    'FoodID', 'FoodGroupName', 'FoodDescription',
+    'Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats',
+    'Fibre', ], axis=1)
