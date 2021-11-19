@@ -178,3 +178,6 @@ if food_id:
                 </tr>
             </table>""", unsafe_allow_html=True)
 
+        fig = px.pie(df, values='NutrientValue', names='NutrientName', title='Proportion of Macros')
+        fig.update_layout(title_x=0.48, legend={"x": 0.80})
+        col_pie.write(fig)
