@@ -1,7 +1,9 @@
 import streamlit as st
 import altair as alt
-from load_data import df, df_piv
+from load_data import df, df_piv, get_top_perc
+import numpy as np
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.markdown(
     """
@@ -111,8 +113,9 @@ food_id = id_col.text_input("Food ID")
 or_col.write("Or")
 food_name = name_col.text_input("Food name")
 
+food_id = int(food_id)
 if food_id:
-    df_select = df_piv[df_piv['FoodID'] == int(food_id)].reset_index()
+    df_select = df_piv[df_piv['FoodID'] == food_id].reset_index()
     if df_select.empty:
         st.write("Food ID doesn't exist, please try another one.")
     else:
@@ -125,16 +128,53 @@ if food_id:
         fibre = df_select.at[0, 'Fibre']
         calories = df_select.at[0, 'Calories']
 
-        st.markdown(
+        protein_perc = get_top_perc('Protein', food_id=food_id)
+        carbs_perc = get_top_perc('Carbs', food_id=food_id)
+        fats_perc = get_top_perc('Fats', food_id=food_id)
+        sat_fats_perc = get_top_perc('Saturated Fats', food_id=food_id)
+        calories_perc = get_top_perc('Calories', food_id=food_id)
+        fibre_perc = get_top_perc('Fibre', food_id=food_id)
+
+        col_table, col_pie = st.columns(2)
+        col_table.markdown(
             f"""
-            <h2>{food_name}</h2>
+            <h2>{food_name} (100g)</h2>
             <h4>Food Group: {food_group}</h4>
-            <ul style='list-style-type: none;'>
-                <li>Calories: {calories}</li>
-                <li>Carbs: {carbs}</li>
-                <li>Protein: {protein}</li>
-                <li>Fats: {fats}</li>
-                <li>Saturated Fats: {sat_fats}</li>
-                <li>Fibre: {fibre}</li>
-            </ul>
-            """, unsafe_allow_html=True)
+            <table>
+                <tr>
+                    <th>Macro</th>
+                    <th>Amount (g)</th>
+                    <th>Top Percentage</th>
+                </tr>
+                <tr>
+                    <td>Calories</td>
+                    <td>{calories}</td>
+                    <td>{calories_perc}%</td>
+                </tr>
+                <tr>
+                    <td>Carbohydrates</td>
+                    <td>{carbs}</td>
+                    <td>{carbs_perc}%</td>
+                </tr>
+                <tr>
+                    <td>Protein</td>
+                    <td>{protein}</td>
+                    <td>{protein_perc}%</td>
+                </tr>
+                <tr>
+                    <td>Fats</td>
+                    <td>{fats}</td>
+                    <td>{fats_perc}%</td>
+                </tr>
+                <tr>
+                    <td>Saturated Fats</td>
+                    <td>{sat_fats}</td>
+                    <td>{sat_fats_perc}%</td>
+                </tr>
+                <tr>
+                    <td>Fibre</td>
+                    <td>{fibre}</td>
+                    <td>{fibre_perc}%</td>
+                </tr>
+            </table>""", unsafe_allow_html=True)
+

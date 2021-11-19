@@ -1,8 +1,9 @@
 import pandas as pd
 import streamlit as st
+import numpy as np
+
 
 #st.set_page_config(layout="wide")
-
 
 @st.cache(allow_output_mutation=True)
 def load_data():
@@ -42,6 +43,17 @@ def category_cleanup(cat):
     elif cat == 'FATTY ACIDS, SATURATED, TOTAL':
         cat = cat.replace('FATTY ACIDS, SATURATED, TOTAL', 'Saturated fats')
     return cat
+
+
+def get_top_perc(macro, food_id=None, food_desc=None):
+    df_top = df_piv.sort_values(by=macro, ascending=False).reset_index()
+    rank = None
+    if food_id:
+        rank = df_top[df_top['FoodID'] == food_id].index[0] + 1
+    if food_desc:
+        rank = df_top[df_top['FoodDescription'] == food_id].index[0] + 1
+    top_perc = (rank / df_piv.shape[0]) * 100
+    return np.round(top_perc, 1)
 
 
 df = load_data()
