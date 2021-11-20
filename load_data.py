@@ -1,11 +1,7 @@
 import pandas as pd
-import streamlit as st
 import numpy as np
 
 
-#st.set_page_config(layout="wide")
-
-@st.cache(allow_output_mutation=True)
 def load_data():
     engine = r"sqlite:///db/Canadian_Foods.db"
     sql = f"""SELECT DISTINCT
@@ -29,39 +25,28 @@ def load_data():
     return data
 
 
-def category_cleanup(cat):
-    if cat == 'PROTEIN':
-        cat = cat.replace('PROTEIN', 'Protein')
-    elif cat == 'ENERGY (KILOCALORIES)':
-        cat = cat.replace('ENERGY (KILOCALORIES)', 'Calories')
-    elif cat == 'CARBOHYDRATE, TOTAL (BY DIFFERENCE)':
-        cat = cat.replace('CARBOHYDRATE, TOTAL (BY DIFFERENCE)', 'Carbs')
-    elif cat == 'FIBRE, TOTAL DIETARY':
-        cat = cat.replace('FIBRE, TOTAL DIETARY', 'Fibre')
-    elif cat == 'FAT (TOTAL LIPIDS)':
-        cat = cat.replace('FAT (TOTAL LIPIDS)', 'Fats')
-    elif cat == 'FATTY ACIDS, SATURATED, TOTAL':
-        cat = cat.replace('FATTY ACIDS, SATURATED, TOTAL', 'Saturated fats')
-    return cat
-
-
 def get_top_perc(macro, food_id=None, food_desc=None):
-    df_top = df_piv.sort_values(by=macro, ascending=False).reset_index()
+    df_top = df.sort_values(by=macro, ascending=False).reset_index()
     rank = None
     if food_id:
         rank = df_top[df_top['FoodID'] == food_id].index[0] + 1
     if food_desc:
         rank = df_top[df_top['FoodDescription'] == food_id].index[0] + 1
-    top_perc = (rank / df_piv.shape[0]) * 100
+    top_perc = (rank / df.shape[0]) * 100
     return np.round(top_perc, 1)
 
 
 df = load_data()
-df['NutrientName'] = df['NutrientName'].apply(lambda x: category_cleanup(x))
 
 df = df.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
 df.reset_index(drop=False, inplace=True)
 df = df.reindex([
     'FoodID', 'FoodGroupName', 'FoodDescription',
-    'Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats',
-    'Fibre', ], axis=1)
+    'ENERGY (KILOCALORIES)', 'CARBOHYDRATE, TOTAL (BY DIFFERENCE)',
+    'PROTEIN', 'FAT (TOTAL LIPIDS)', 'FATTY ACIDS, SATURATED, TOTAL',
+    'FIBRE, TOTAL DIETARY',
+    ], axis=1)
+
+df.columns = [
+    'FoodID', 'FoodGroupName', 'FoodDescription',
+    'Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats', 'Fibre']
