@@ -59,9 +59,9 @@ def get_top_perc(macro, food_id=None, food_desc=None):
 df = load_data()
 df['NutrientName'] = df['NutrientName'].apply(lambda x: category_cleanup(x))
 
-df_piv = df.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
-df_piv.reset_index(drop=False, inplace=True)
-df_piv = df_piv.reindex([
+df = df.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
+df.reset_index(drop=False, inplace=True)
+df = df.reindex([
     'FoodID', 'FoodGroupName', 'FoodDescription',
     'Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats',
     'Fibre', ], axis=1)
