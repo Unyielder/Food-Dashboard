@@ -1,8 +1,9 @@
 import dash
 from dash import dcc, html, dash_table
 import plotly.express as px
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from load_data import df
+from fuzzywuzzy import process
 
 
 app = dash.Dash(__name__)
@@ -23,10 +24,27 @@ app.layout = html.Div([
     ),
     dcc.Graph(id='group-mean'),
 
+    html.Div(id='table_div'),
+
     html.Div(
-        id='table_div'),
+        children="Food name",
+        id='food-name'),
+    dcc.Input(
+        id="text-input",
+        type="text",
+        value=""
+    ),
 
-
+    html.Div(
+        children="Food ID",
+        id='food-id'),
+    dcc.Input(
+        id="num-input",
+        type="number",
+        value=""
+    ),
+    html.Button('Food search', id='submit-val', n_clicks=0),
+    html.Div(id='search-results')
 ])
 
 
@@ -48,6 +66,29 @@ def filter_df(radio_val):
             data=df_filter[:10].to_dict("records")
         )
     ])
+
+
+@app.callback([Output('search-results', 'children')],
+              [Input('submit-val', 'n_clicks')],
+              [State('text-input', 'value'),
+               State('num-input', 'value')])
+def on_click(n_clicks, text_val, num_val):
+    if text_val:
+
+        matches = process.extract(text_val, df['FoodDescription'].to_list(), limit=150)
+        matches = [match[0] for match in matches if int(match[1]) >= 90]
+        df_matches = df[df['FoodDescription'].isin(matches)]
+        df_matches = df_matches[["FoodID", "FoodDescription"]]
+
+        return html.Div([
+            dash_table.DataTable(
+                id='search-table',
+                columns=[{"name": i, "id": i} for i in df_matches.columns],
+                data=df_matches.to_dict("records")
+            )
+        ])
+    else:
+        return dash.no_update
 
 
 if __name__ == '__main__':
