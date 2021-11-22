@@ -35,14 +35,6 @@ app.layout = html.Div([
         value=""
     ),
 
-    html.Div(
-        children="Food ID",
-        id='food-id'),
-    dcc.Input(
-        id="num-input",
-        type="number",
-        value=""
-    ),
     html.Button('Food search', id='submit-val', n_clicks=0),
     html.Div(id='search-results')
 ])
@@ -68,15 +60,13 @@ def filter_df(radio_val):
     ])
 
 
-@app.callback([Output('search-results', 'children')],
+@app.callback(Output('search-results', 'children'),
               [Input('submit-val', 'n_clicks')],
-              [State('text-input', 'value'),
-               State('num-input', 'value')])
-def on_click(n_clicks, text_val, num_val):
+              [State('text-input', 'value')])
+def on_click(n_clicks, text_val):
     if text_val:
-
         matches = process.extract(text_val, df['FoodDescription'].to_list(), limit=150)
-        matches = [match[0] for match in matches if int(match[1]) >= 90]
+        matches = sorted([match[0] for match in matches if int(match[1]) >= 85])
         df_matches = df[df['FoodDescription'].isin(matches)]
         df_matches = df_matches[["FoodID", "FoodDescription"]]
 
@@ -84,6 +74,9 @@ def on_click(n_clicks, text_val, num_val):
             dash_table.DataTable(
                 id='search-table',
                 columns=[{"name": i, "id": i} for i in df_matches.columns],
+                row_selectable='single',
+                page_current=0,
+                page_size=10,
                 data=df_matches.to_dict("records")
             )
         ])
