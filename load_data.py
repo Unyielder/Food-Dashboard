@@ -36,9 +36,9 @@ def get_top_perc(macro, food_id=None, food_desc=None):
     return np.round(top_perc, 1)
 
 
-df = load_data()
+data = load_data()
 
-df = df.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
+df = data.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
 df.reset_index(drop=False, inplace=True)
 df = df.reindex([
     'FoodID', 'FoodGroupName', 'FoodDescription',
