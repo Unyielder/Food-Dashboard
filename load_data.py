@@ -36,17 +36,21 @@ def get_top_perc(macro, food_id=None, food_desc=None):
     return np.round(top_perc, 1)
 
 
-data = load_data()
+def rename_cols(df):
+    df['NutrientName'] = [
+        name.replace('ENERGY (KILOCALORIES)', 'Calories')
+            .replace('CARBOHYDRATE, TOTAL (BY DIFFERENCE)', 'Carbs')
+            .replace('PROTEIN', 'Protein')
+            .replace('FAT (TOTAL LIPIDS)', 'Fats')
+            .replace('FATTY ACIDS, SATURATED, TOTAL', 'Saturated Fats')
+            .replace('FIBRE, TOTAL DIETARY', 'Fibre') for name in df['NutrientName']
+    ]
 
-df = data.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
-df.reset_index(drop=False, inplace=True)
-df = df.reindex([
-    'FoodID', 'FoodGroupName', 'FoodDescription',
-    'ENERGY (KILOCALORIES)', 'CARBOHYDRATE, TOTAL (BY DIFFERENCE)',
-    'PROTEIN', 'FAT (TOTAL LIPIDS)', 'FATTY ACIDS, SATURATED, TOTAL',
-    'FIBRE, TOTAL DIETARY',
-    ], axis=1)
+    return df
 
-df.columns = [
-    'FoodID', 'FoodGroupName', 'FoodDescription',
-    'Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats', 'Fibre']
+
+df = load_data()
+df = rename_cols(df)
+
+df_piv = df.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
+df_piv.reset_index(drop=False, inplace=True)
