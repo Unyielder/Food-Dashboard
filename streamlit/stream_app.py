@@ -63,7 +63,6 @@ def scatter_plot(x, y, df):
 
     merged_df = x_df.merge(y_df, how='inner', left_on='FoodID', right_on='FoodID')
     merged_df.columns = ['FoodID', 'FoodGroupName', 'FoodDescription', 'X', 'Y']
-    # return merged_df.plot(kind='scatter', x='X', y='Y', xlabel=x, ylabel=y, figsize=(12, 6))
     return merged_df
 
 

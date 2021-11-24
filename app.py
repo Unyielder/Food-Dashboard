@@ -4,7 +4,7 @@ import plotly.express as px
 from dash.dependencies import Input, Output, State
 from dash_extensions import EventListener
 import pandas as pd
-from load_data import data, df
+from load_data import df, df_piv
 from fuzzywuzzy import process
 
 
@@ -44,20 +44,33 @@ app.layout = html.Div([
     html.Div(
         id='query-results'
     ),
-    dcc.Graph(id='pie-chart')
+    dcc.Graph(id='pie-chart'),
+
+    dcc.Dropdown(
+        id='nutrient-dropdown-1',
+        options=[{'label': macro, 'value': macro} for macro in macro_list],
+        value='Protein'
+    ),
+    dcc.Dropdown(
+        id='nutrient-dropdown-2',
+        options=[{'label': macro, 'value': macro} for macro in macro_list],
+        value='Carbs'
+    ),
+
+    dcc.Graph(id='scatter-matrix')
 ])
 
 
 @app.callback(Output('group-mean', 'figure'), Input('macro-radio', 'value'))
 def update_macro_mean(radio_val):
-    df_select = df.groupby("FoodGroupName").mean()[radio_val].sort_values(ascending=True).reset_index()
+    df_select = df_piv.groupby("FoodGroupName").mean()[radio_val].sort_values(ascending=True).reset_index()
     fig = px.bar(df_select, x=radio_val, y="FoodGroupName", width=1000, height=650)
     return fig
 
 
 @app.callback(Output('table_div', 'children'), Input('macro-radio', 'value'))
 def filter_df(radio_val):
-    df_filter = df[["FoodID", "FoodDescription", radio_val]].sort_values(by=radio_val, ascending=False)
+    df_filter = df_piv[["FoodID", "FoodDescription", radio_val]].sort_values(by=radio_val, ascending=False)
 
     return html.Div([
         dash_table.DataTable(
@@ -73,9 +86,9 @@ def filter_df(radio_val):
               [State('text-input', 'value')])
 def button_click(n_clicks, text_val):
     if text_val:
-        matches = process.extract(text_val, df['FoodDescription'].to_list(), limit=150)
+        matches = process.extract(text_val, df_piv['FoodDescription'].to_list(), limit=150)
         matches = sorted([match[0] for match in matches if int(match[1]) >= 85])
-        df_matches = df[df['FoodDescription'].isin(matches)]
+        df_matches = df_piv[df_piv['FoodDescription'].isin(matches)]
         df_matches = df_matches[["FoodDescription"]]
 
         return html.Div([EventListener(id="el", events=[{"event": "click", "props": [listen_prop]}], children=[
@@ -99,7 +112,7 @@ def button_click(n_clicks, text_val):
 def query_results(event):
     food_name = event[listen_prop]
 
-    df_event = df[df['FoodDescription'] == food_name].reset_index()
+    df_event = df_piv[df_piv['FoodDescription'] == food_name].reset_index()
     #calories = df_event.at[0, 'Calories']
     carbs = df_event.at[0, 'Carbs']
     protein = df_event.at[0, 'Protein']
@@ -108,7 +121,7 @@ def query_results(event):
     fibre = df_event.at[0, 'Fibre']
 
     fig = px.pie(
-        data[data['FoodDescription'] == food_name],
+        df[df['FoodDescription'] == food_name],
         values='NutrientValue',
         names='NutrientName',
         title='Proportion of Macros'
@@ -124,6 +137,24 @@ def query_results(event):
             html.Li(f"{fibre} g Fibre")
         ])
     ]), fig
+
+
+@app.callback(Output('scatter-matrix', 'figure'),
+              [Input('nutrient-dropdown-1', 'value'),
+               Input('nutrient-dropdown-2', 'value')])
+def scatter_matrix(x, y):
+    x_df = df[df['NutrientName'] == x][['FoodID', 'FoodGroupName', 'FoodDescription', 'NutrientValue']]
+    y_df = df[df['NutrientName'] == y][['FoodID', 'NutrientValue']]
+
+    merged_df = x_df.merge(y_df, how='inner', left_on='FoodID', right_on='FoodID')
+    merged_df.columns = ['FoodID', 'FoodGroupName', 'FoodDescription', 'X', 'Y']
+
+    return px.scatter(
+        merged_df,
+        x="X",
+        y="Y",
+        color="FoodGroupName"
+    )
 
 
 if __name__ == '__main__':
