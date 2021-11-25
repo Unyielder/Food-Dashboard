@@ -2,8 +2,8 @@ import dash
 from dash import dcc, html, dash_table
 import plotly.express as px
 from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 from dash_extensions import EventListener
-import pandas as pd
 from load_data import df, df_piv
 from fuzzywuzzy import process
 
@@ -44,7 +44,11 @@ app.layout = html.Div([
     html.Div(
         id='query-results'
     ),
-    dcc.Graph(id='pie-chart'),
+
+    html.Div(id='pie-container', children=[
+        dcc.Graph(id='pie-chart')
+    ]),
+
 
     dcc.Dropdown(
         id='nutrient-dropdown-1',
@@ -110,6 +114,9 @@ def button_click(n_clicks, text_val):
     Output('pie-chart', 'figure')],
     Input("el", "event"), prevent_initial_call=True)
 def query_results(event):
+    if event is None:
+        raise PreventUpdate
+
     food_name = event[listen_prop]
 
     df_event = df_piv[df_piv['FoodDescription'] == food_name].reset_index()
@@ -139,6 +146,15 @@ def query_results(event):
     ]), fig
 
 
+@app.callback(
+    Output('pie-container', 'style'), Input('pie-chart', 'figure'))
+def hide_graph(fig):
+    if fig:
+        return {'display': 'block'}
+    else:
+        return {'display': 'none'}
+
+
 @app.callback(Output('scatter-matrix', 'figure'),
               [Input('nutrient-dropdown-1', 'value'),
                Input('nutrient-dropdown-2', 'value')])
@@ -149,12 +165,13 @@ def scatter_matrix(x, y):
     merged_df = x_df.merge(y_df, how='inner', left_on='FoodID', right_on='FoodID')
     merged_df.columns = ['FoodID', 'FoodGroupName', 'FoodDescription', 'X', 'Y']
 
-    return px.scatter(
+    fig = px.scatter(
         merged_df,
         x="X",
         y="Y",
         color="FoodGroupName"
     )
+    return fig
 
 
 if __name__ == '__main__':
