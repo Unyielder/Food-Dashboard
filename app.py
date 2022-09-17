@@ -15,67 +15,69 @@ macro_list = ['Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats', 'Fibre']
 listen_prop = "srcElement.innerText"
 
 app.layout = html.Div([
-    html.H1(
-        children='Canadian Foods Dashboard',
-        style={
-            'textAlign': 'center'
-        }
-    ),
-
-    html.Div([
-        dcc.RadioItems(
-            id='macro-radio',
-            options=[{'label': macro, 'value': macro} for macro in macro_list],
-            value='Protein'
-            ),
-        html.Div([
-            dcc.Graph(id='group-mean', className='food-group-chart', style={}),
-            html.Div(id='table_div', className='table-top-10', style={'margin-top':'100px'}),
-        ], style={'display': 'flex', 'flex-direction':'row', 'margin-bottom':'50px'}, className='div-1'),
-    ], className='component'),
-
+    html.Ul([
+        html.Li("Canadian Foods Dashboard", id="nav-title"),
+        html.Li(html.A(
+            "Food Query", href="https://food-queryx.herokuapp.com/query"),
+            style={'float':'right'})
+    ], className="nav"),
 
     html.Div([
         html.Div([
-            html.P("Please enter food description:"),
-            dcc.Input(
-                id="text-input",
-                type="text",
-                value=""
-            ),
-            html.Button('Food search', id='submit-val', n_clicks=0),
-        ], style={'margin-bottom':'30px'}),
-
-    html.Div([
-        html.Div(id='search-results'),
-        html.Div(id='query-results'),
-        dcc.Graph(id='pie-chart', style={'width':'35%'})
-    ], style={'display': 'flex', 'flex-direction':'row', 'justify-content': 'space-around'}),
-
-    ], className='component'),
-
-    html.Div([
-        html.Div([
-            dcc.Dropdown(
-                id='nutrient-dropdown-1',
+            dcc.RadioItems(
+                id='macro-radio',
                 options=[{'label': macro, 'value': macro} for macro in macro_list],
-                value='Protein',
-                # style={'width':'50%'}
+                value='Protein'
             ),
-            dcc.Dropdown(
-                id='nutrient-dropdown-2',
-                options=[{'label': macro, 'value': macro} for macro in macro_list],
-                value='Carbs',
-                # style={'width':'50%'}
+            html.Div([
+                dcc.Graph(id='group-mean', className='food-group-chart', style={}),
+                html.Div(id='table_div', className='table-top-10', style={'margin-top': '100px', 'width': '30%'}),
+            ], style={'display': 'flex', 'flex-direction': 'row', 'margin-bottom': '50px'}, className='div-1'),
+        ], className='component'),
+
+        html.Div([
+            html.Div([
+                html.P("Please enter food description:"),
+                dcc.Input(
+                    id="text-input",
+                    type="text",
+                    value=""
+                ),
+                html.Button('Food search', id='submit-val', n_clicks=0),
+            ], style={'margin-bottom': '30px'}),
+
+            html.Div([
+                html.Div(id='search-results'),
+                html.Div(id='query-results'),
+                dcc.Graph(id='pie-chart', style={'width': '35%'})
+            ], style={'display': 'flex', 'flex-direction': 'row', 'justify-content': 'space-around'}),
+
+        ], className='component'),
+
+        html.Div([
+            html.Div([
+                dcc.Dropdown(
+                    id='nutrient-dropdown-1',
+                    options=[{'label': macro, 'value': macro} for macro in macro_list],
+                    value='Protein',
+                    # style={'width':'50%'}
+                ),
+                dcc.Dropdown(
+                    id='nutrient-dropdown-2',
+                    options=[{'label': macro, 'value': macro} for macro in macro_list],
+                    value='Carbs',
+                    # style={'width':'50%'}
+                )
+            ], style={'width': '20%'}),
+            dcc.Graph(
+                id='scatter-matrix',
+                style={'width': '100%'}
             )
-        ], style={'width':'20%'}),
-        dcc.Graph(
-            id='scatter-matrix',
-            style={ 'width':'100%'}
-        )
-    ], className='component')
+        ], className='component')
+    ], className='container'),
 
-], className='container')
+
+])
 
 
 @app.callback(Output('group-mean', 'figure'), Input('macro-radio', 'value'))
@@ -87,7 +89,7 @@ def update_macro_mean(radio_val):
 
 @app.callback(Output('table_div', 'children'), Input('macro-radio', 'value'))
 def filter_df(radio_val):
-    df_filter = df_piv[["FoodID", "FoodDescription", radio_val]].sort_values(by=radio_val, ascending=False)
+    df_filter = df_piv[["FoodDescription", radio_val]].sort_values(by=radio_val, ascending=False)
 
     return html.Div([
         dash_table.DataTable(
