@@ -28,7 +28,9 @@ app.layout = html.Div([
             dcc.RadioItems(
                 id='macro-radio',
                 options=[{'label': macro, 'value': macro} for macro in macro_list],
-                value='Protein'
+                value='Protein',
+                labelStyle={'margin-left': '10px'}
+
             ),
             html.Div([
                 dcc.Graph(id='group-mean', className='food-group-chart', style={}),
