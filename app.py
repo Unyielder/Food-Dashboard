@@ -83,21 +83,23 @@ app.layout = html.Div([
 
 @app.callback(Output('group-mean', 'figure'), Input('macro-radio', 'value'))
 def update_macro_mean(radio_val):
-    df_select = df_piv.groupby("FoodGroupName").mean()[radio_val].sort_values(ascending=True).reset_index()
-    fig = px.bar(df_select, x=radio_val, y="FoodGroupName", width=650, height=650)
+    df_select = df_piv.groupby("Food Group").mean()[radio_val].sort_values(ascending=True).reset_index()
+    fig = px.bar(df_select, x=radio_val, y="Food Group", width=650, height=650)
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
 
 @app.callback(Output('table_div', 'children'), Input('macro-radio', 'value'))
 def filter_df(radio_val):
-    df_filter = df_piv[["FoodDescription", radio_val]].sort_values(by=radio_val, ascending=False)
+    df_filter = df_piv[["Food Description", radio_val]].sort_values(by=radio_val, ascending=False)
 
     return html.Div([
         dash_table.DataTable(
             id='table',
             columns=[{"name": i, "id": i} for i in df_filter.columns],
-            data=df_filter[:10].to_dict("records")
+            data=df_filter[:10].to_dict("records"),
+            style_cell={"background-color": 'white'},
+            style_header={"background-color": '#54504c', 'color': 'white'}
         )
     ])
 
@@ -107,10 +109,10 @@ def filter_df(radio_val):
               [State('text-input', 'value')])
 def button_click(n_clicks, text_val):
     if text_val:
-        matches = process.extract(text_val, df_piv['FoodDescription'].to_list(), limit=150)
+        matches = process.extract(text_val, df_piv['Food Description'].to_list(), limit=150)
         matches = sorted([match[0] for match in matches if int(match[1]) >= 85])
-        df_matches = df_piv[df_piv['FoodDescription'].isin(matches)]
-        df_matches = df_matches[["FoodDescription"]]
+        df_matches = df_piv[df_piv['Food Description'].isin(matches)]
+        df_matches = df_matches[["Food Description"]]
 
         return html.Div([EventListener(id="el", events=[{"event": "click", "props": [listen_prop]}], children=[
             dash_table.DataTable(
@@ -118,10 +120,11 @@ def button_click(n_clicks, text_val):
                 columns=[{"name": i, "id": i} for i in df_matches.columns],
                 page_current=0,
                 page_size=10,
-                data=df_matches.to_dict("records")
+                data=df_matches.to_dict("records"),
+                style_cell={"background-color": 'white'},
+                style_header={"background-color": '#54504c', 'color': 'white'}
             )
-        ])
-        ])
+        ])])
     else:
         return dash.no_update
 
@@ -136,7 +139,7 @@ def query_results(event):
 
     food_name = event[listen_prop]
 
-    df_event = df_piv[df_piv['FoodDescription'] == food_name].reset_index()
+    df_event = df_piv[df_piv['Food Description'] == food_name].reset_index()
     #calories = df_event.at[0, 'Calories']
     carbs = df_event.at[0, 'Carbs']
     protein = df_event.at[0, 'Protein']
@@ -145,7 +148,7 @@ def query_results(event):
     fibre = df_event.at[0, 'Fibre']
 
     fig = px.pie(
-        df[df['FoodDescription'] == food_name],
+        df[df['Food Description'] == food_name],
         values='NutrientValue',
         names='NutrientName',
         title='Proportion of Macros'
@@ -178,17 +181,17 @@ def hide_graph(fig):
               [Input('nutrient-dropdown-1', 'value'),
                Input('nutrient-dropdown-2', 'value')])
 def scatter_matrix(x, y):
-    x_df = df[df['NutrientName'] == x][['FoodID', 'FoodGroupName', 'FoodDescription', 'NutrientValue']]
+    x_df = df[df['NutrientName'] == x][['FoodID', 'Food Group', 'Food Description', 'NutrientValue']]
     y_df = df[df['NutrientName'] == y][['FoodID', 'NutrientValue']]
 
     merged_df = x_df.merge(y_df, how='inner', left_on='FoodID', right_on='FoodID')
-    merged_df.columns = ['FoodID', 'FoodGroupName', 'FoodDescription', 'X', 'Y']
+    merged_df.columns = ['FoodID', 'Food Group', 'Food Description', 'X', 'Y']
 
     fig = px.scatter(
         merged_df,
         x='X',
         y='Y',
-        color="FoodGroupName"
+        color="Food Group"
     )
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 

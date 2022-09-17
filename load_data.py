@@ -45,12 +45,13 @@ def rename_cols(df):
             .replace('FATTY ACIDS, SATURATED, TOTAL', 'Saturated Fats')
             .replace('FIBRE, TOTAL DIETARY', 'Fibre') for name in df['NutrientName']
     ]
-
+    print(df.columns)
+    df.rename(columns={'FoodDescription': 'Food Description', 'FoodGroupName': 'Food Group'}, inplace=True)
     return df
 
 
 df = load_data()
 df = rename_cols(df)
 
-df_piv = df.pivot_table(values='NutrientValue', index=['FoodID', 'FoodGroupName', 'FoodDescription'], columns='NutrientName')
+df_piv = df.pivot_table(values='NutrientValue', index=['FoodID', 'Food Group', 'Food Description'], columns='NutrientName')
 df_piv.reset_index(drop=False, inplace=True)
