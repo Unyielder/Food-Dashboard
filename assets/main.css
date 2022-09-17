@@ -1,8 +1,8 @@
 body {
-
+    background-color: #bfcbdb
 }
-.container {
-
+.component {
+    background-color: rgb(255, 255, 255, 0.9);
 }
 .nav {
   display: flex;
@@ -46,6 +46,10 @@ li a:hover {
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 30px;
+}
+
+#query-results ul {
+  list-style-type: none;
 }
 
 .div-1{

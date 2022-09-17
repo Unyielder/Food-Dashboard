@@ -2,6 +2,7 @@ import dash
 from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
 import plotly.express as px
+from plotly.graph_objs import *
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_extensions import EventListener
@@ -84,6 +85,7 @@ app.layout = html.Div([
 def update_macro_mean(radio_val):
     df_select = df_piv.groupby("FoodGroupName").mean()[radio_val].sort_values(ascending=True).reset_index()
     fig = px.bar(df_select, x=radio_val, y="FoodGroupName", width=650, height=650)
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
 
@@ -148,6 +150,8 @@ def query_results(event):
         names='NutrientName',
         title='Proportion of Macros'
     )
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+
     return html.Div([
         html.H4(food_name),
         html.Ul([
@@ -186,6 +190,8 @@ def scatter_matrix(x, y):
         y='Y',
         color="FoodGroupName"
     )
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+
     return fig
 
 
