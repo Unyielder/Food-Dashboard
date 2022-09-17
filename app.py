@@ -51,20 +51,27 @@ app.layout = html.Div([
 
     ]),
 
+    html.Div([
+        html.Div([
+            dcc.Dropdown(
+                id='nutrient-dropdown-1',
+                options=[{'label': macro, 'value': macro} for macro in macro_list],
+                value='Protein',
+                # style={'width':'50%'}
+            ),
+            dcc.Dropdown(
+                id='nutrient-dropdown-2',
+                options=[{'label': macro, 'value': macro} for macro in macro_list],
+                value='Carbs',
+                # style={'width':'50%'}
+            )
+        ], style={'width':'20%'}),
+        dcc.Graph(
+            id='scatter-matrix',
+            style={ 'width':'70%'}
+        )
+    ], style={})
 
-
-    dcc.Dropdown(
-        id='nutrient-dropdown-1',
-        options=[{'label': macro, 'value': macro} for macro in macro_list],
-        value='Protein'
-    ),
-    dcc.Dropdown(
-        id='nutrient-dropdown-2',
-        options=[{'label': macro, 'value': macro} for macro in macro_list],
-        value='Carbs'
-    ),
-
-    dcc.Graph(id='scatter-matrix')
 ])
 
 
@@ -170,8 +177,8 @@ def scatter_matrix(x, y):
 
     fig = px.scatter(
         merged_df,
-        x="X",
-        y="Y",
+        x='X',
+        y='Y',
         color="FoodGroupName"
     )
     return fig
