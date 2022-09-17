@@ -21,16 +21,19 @@ app.layout = html.Div([
             'textAlign': 'center'
         }
     ),
-    dcc.RadioItems(
-        id='macro-radio',
-        options=[{'label': macro, 'value': macro} for macro in macro_list],
-        value='Protein'
-    ),
 
     html.Div([
-        dcc.Graph(id='group-mean', className='food-group-chart', style={}),
-        html.Div(id='table_div', className='table-top-10', style={'margin-top':'100px'}),
-    ], style={'display': 'flex', 'flex-direction':'row', 'margin-bottom':'50px'}, className='div-1'),
+        dcc.RadioItems(
+            id='macro-radio',
+            options=[{'label': macro, 'value': macro} for macro in macro_list],
+            value='Protein'
+            ),
+        html.Div([
+            dcc.Graph(id='group-mean', className='food-group-chart', style={}),
+            html.Div(id='table_div', className='table-top-10', style={'margin-top':'100px'}),
+        ], style={'display': 'flex', 'flex-direction':'row', 'margin-bottom':'50px'}, className='div-1'),
+    ], className='component'),
+
 
     html.Div([
         html.Div([
@@ -46,10 +49,10 @@ app.layout = html.Div([
     html.Div([
         html.Div(id='search-results'),
         html.Div(id='query-results'),
-        dcc.Graph(id='pie-chart', style={})
+        dcc.Graph(id='pie-chart', style={'width':'35%'})
     ], style={'display': 'flex', 'flex-direction':'row', 'justify-content': 'space-around'}),
 
-    ]),
+    ], className='component'),
 
     html.Div([
         html.Div([
@@ -68,17 +71,17 @@ app.layout = html.Div([
         ], style={'width':'20%'}),
         dcc.Graph(
             id='scatter-matrix',
-            style={ 'width':'70%'}
+            style={ 'width':'100%'}
         )
-    ], style={})
+    ], className='component')
 
-])
+], className='container')
 
 
 @app.callback(Output('group-mean', 'figure'), Input('macro-radio', 'value'))
 def update_macro_mean(radio_val):
     df_select = df_piv.groupby("FoodGroupName").mean()[radio_val].sort_values(ascending=True).reset_index()
-    fig = px.bar(df_select, x=radio_val, y="FoodGroupName", width=700, height=650)
+    fig = px.bar(df_select, x=radio_val, y="FoodGroupName", width=650, height=650)
     return fig
 
 
