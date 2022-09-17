@@ -1,5 +1,6 @@
 import dash
 from dash import dcc, html, dash_table
+import dash_bootstrap_components as dbc
 import plotly.express as px
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -8,7 +9,7 @@ from load_data import df, df_piv
 from fuzzywuzzy import process
 
 
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
+app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 macro_list = ['Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats', 'Fibre']
 listen_prop = "srcElement.innerText"
@@ -25,29 +26,31 @@ app.layout = html.Div([
         options=[{'label': macro, 'value': macro} for macro in macro_list],
         value='Protein'
     ),
-    dcc.Graph(id='group-mean'),
 
-    html.Div(id='table_div'),
+    html.Div([
+        dcc.Graph(id='group-mean', className='food-group-chart', style={}),
+        html.Div(id='table_div', className='table-top-10', style={'margin-top':'100px'}),
+    ], style={'display': 'flex', 'flex-direction':'row', 'margin-bottom':'50px'}, className='div-1'),
 
-    html.Div(
-        children="Food name",
-        id='food-name'),
-    dcc.Input(
-        id="text-input",
-        type="text",
-        value=""
-    ),
+    html.Div([
+        html.Div([
+            html.P("Please enter food description:"),
+            dcc.Input(
+                id="text-input",
+                type="text",
+                value=""
+            ),
+            html.Button('Food search', id='submit-val', n_clicks=0),
+        ], style={'margin-bottom':'30px'}),
 
-    html.Button('Food search', id='submit-val', n_clicks=0),
-    html.Div(id='search-results'),
+    html.Div([
+        html.Div(id='search-results'),
+        html.Div(id='query-results'),
+        dcc.Graph(id='pie-chart', style={})
+    ], style={'display': 'flex', 'flex-direction':'row', 'justify-content': 'space-around'}),
 
-    html.Div(
-        id='query-results'
-    ),
-
-    html.Div(id='pie-container', children=[
-        dcc.Graph(id='pie-chart')
     ]),
+
 
 
     dcc.Dropdown(
@@ -68,7 +71,7 @@ app.layout = html.Div([
 @app.callback(Output('group-mean', 'figure'), Input('macro-radio', 'value'))
 def update_macro_mean(radio_val):
     df_select = df_piv.groupby("FoodGroupName").mean()[radio_val].sort_values(ascending=True).reset_index()
-    fig = px.bar(df_select, x=radio_val, y="FoodGroupName", width=1000, height=650)
+    fig = px.bar(df_select, x=radio_val, y="FoodGroupName", width=700, height=650)
     return fig
 
 
@@ -147,7 +150,7 @@ def query_results(event):
 
 
 @app.callback(
-    Output('pie-container', 'style'), Input('pie-chart', 'figure'))
+    Output('pie-chart', 'style'), Input('pie-chart', 'figure'))
 def hide_graph(fig):
     if fig:
         return {'display': 'block'}
