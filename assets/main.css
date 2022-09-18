@@ -49,17 +49,22 @@ li a:hover {
     margin-bottom: 30px;
 }
 
+#text-input {
+    width: 400px;
+    margin-right: 5px;
+}
+button {
+    border-color: #333;
+    border-radius: 5px;
+    background-color: #54504c;
+    color: white;
+    padding: 6;
+}
+
+button:hover {
+    background-color: #333;
+}
+
 #query-results ul {
   list-style-type: none;
-}
-
-.div-1{
-
-}
-.food-group-chart {
-
-}
-
-.table-top-10 {
-
 }
