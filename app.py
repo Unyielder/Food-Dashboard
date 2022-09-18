@@ -141,7 +141,6 @@ def query_results(event):
         raise PreventUpdate
 
     food_name = event[listen_prop]
-
     df_stats = df_piv[df_piv['Food Description'] == food_name].reset_index()
     df_fig = df[(df['NutrientName'] != 'Calories') & (df['Food Description'] == food_name)].reset_index()
 
@@ -155,14 +154,13 @@ def query_results(event):
         df_fig,
         values='NutrientValue',
         names='NutrientName',
-        title='Proportion of Macros'
+        title='Macro Breakdown'
     )
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
 
     return html.Div([
         html.H4(food_name),
         html.Ul([
-            #html.Li(f"{calories} kcal Calories"),
             html.Li(f"{carbs} g Carbs"),
             html.Li(f"{protein} g Protein"),
             html.Li(f"{fats} g Fats"),
@@ -190,11 +188,12 @@ def scatter_matrix(x, y):
 
     merged_df = x_df.merge(y_df, how='inner', left_on='FoodID', right_on='FoodID')
     merged_df.columns = ['FoodID', 'Food Group', 'Food Description', 'X', 'Y']
+    merged_df.rename(columns={'X': x, 'Y': y}, inplace=True)
 
     fig = px.scatter(
         merged_df,
-        x='X',
-        y='Y',
+        x=f'{x}',
+        y=f'{y}',
         color="Food Group"
     )
     fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
