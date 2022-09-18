@@ -34,7 +34,7 @@ app.layout = html.Div([
             ),
             html.Div([
                 dcc.Graph(id='group-mean', className='food-group-chart', style={}),
-                html.Div(id='table_div', className='table-top-10', style={'margin-top': '100px', 'width': '30%'}),
+                html.Div(id='table_div', className='table-top-10', style={'margin-top': '100px', 'width': '45%'}),
             ], style={'display': 'flex', 'flex-direction': 'row', 'margin-bottom': '50px'}, className='div-1'),
         ], className='component'),
 
@@ -99,6 +99,7 @@ def filter_df(radio_val):
             columns=[{"name": i, "id": i} for i in df_filter.columns],
             data=df_filter[:10].to_dict("records"),
             style_cell={"background-color": 'white'},
+            style_data={'whiteSpace':'normal', 'height':'auto'},
             style_header={"background-color": '#54504c', 'color': 'white'}
         )
     ])
