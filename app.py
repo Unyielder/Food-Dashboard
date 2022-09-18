@@ -10,6 +10,7 @@ from fuzzywuzzy import process
 
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.title = "Food Dashboard"
 server = app.server
 
 macro_list = ['Calories', 'Carbs', 'Protein', 'Fats', 'Saturated Fats', 'Fibre']
