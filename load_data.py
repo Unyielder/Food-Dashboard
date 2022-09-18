@@ -45,7 +45,6 @@ def rename_cols(df):
             .replace('FATTY ACIDS, SATURATED, TOTAL', 'Saturated Fats')
             .replace('FIBRE, TOTAL DIETARY', 'Fibre') for name in df['NutrientName']
     ]
-    print(df.columns)
     df.rename(columns={'FoodDescription': 'Food Description', 'FoodGroupName': 'Food Group'}, inplace=True)
     return df
 
