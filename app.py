@@ -20,8 +20,7 @@ app.layout = html.Div([
     html.Ul([
         html.Li("Canadian Foods Dashboard", id="nav-title"),
         html.Li(html.A(
-            "Food Query", href="https://food-queryx.herokuapp.com/query"),
-            style={'float':'right'})
+            "Food Query", href="https://food-queryx.herokuapp.com/query"), id="food-query-link")
     ], className="nav"),
 
     html.Div([
@@ -32,7 +31,6 @@ app.layout = html.Div([
                 options=[{'label': macro, 'value': macro} for macro in macro_list],
                 value='Protein',
                 labelStyle={'margin-left': '10px'}
-
             ),
             html.Div([
                 dcc.Graph(id='group-mean', className='food-group-chart', style={}),
