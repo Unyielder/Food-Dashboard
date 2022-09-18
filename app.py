@@ -53,7 +53,7 @@ app.layout = html.Div([
                 html.Div(id='search-results'),
                 html.Div(id='query-results'),
                 dcc.Graph(id='pie-chart', style={'width': '35%'})
-            ], style={'display': 'flex', 'flex-direction': 'row', 'justify-content': 'space-around'}),
+            ], style={'display': 'flex', 'flex-direction': 'row', 'justify-content': 'space-around', 'gap': '10px'}),
 
         ], className='component'),
 
