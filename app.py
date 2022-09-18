@@ -142,16 +142,17 @@ def query_results(event):
 
     food_name = event[listen_prop]
 
-    df_event = df_piv[df_piv['Food Description'] == food_name].reset_index()
-    #calories = df_event.at[0, 'Calories']
-    carbs = df_event.at[0, 'Carbs']
-    protein = df_event.at[0, 'Protein']
-    fats = df_event.at[0, 'Fats']
-    sat_fats = df_event.at[0, 'Saturated Fats']
-    fibre = df_event.at[0, 'Fibre']
+    df_stats = df_piv[df_piv['Food Description'] == food_name].reset_index()
+    df_fig = df[(df['NutrientName'] != 'Calories') & (df['Food Description'] == food_name)].reset_index()
+
+    carbs = round(df_stats.at[0, 'Carbs'], 2)
+    protein = round(df_stats.at[0, 'Protein'], 2)
+    fats = round(df_stats.at[0, 'Fats'], 2)
+    sat_fats = round(df_stats.at[0, 'Saturated Fats'], 2)
+    fibre = round(df_stats.at[0, 'Fibre'], 2)
 
     fig = px.pie(
-        df[df['Food Description'] == food_name],
+        df_fig,
         values='NutrientValue',
         names='NutrientName',
         title='Proportion of Macros'
