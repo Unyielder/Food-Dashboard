@@ -26,6 +26,7 @@ app.layout = html.Div([
 
     html.Div([
         html.Div([
+            html.H6("Top Food Groups per Nutrient", className="component-title"),
             dcc.RadioItems(
                 id='macro-radio',
                 options=[{'label': macro, 'value': macro} for macro in macro_list],
@@ -40,6 +41,7 @@ app.layout = html.Div([
         ], className='component'),
 
         html.Div([
+            html.H6("Food Macro Query", className="component-title"),
             html.Div([
                 html.P("Please enter food description and SELECT search item:"),
                 dcc.Input(
@@ -59,6 +61,7 @@ app.layout = html.Div([
         ], className='component'),
 
         html.Div([
+            html.H6("Nutrient Scatter Plot", className="component-title"),
             html.Div([
                 dcc.Dropdown(
                     id='nutrient-dropdown-1',

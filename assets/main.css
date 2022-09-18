@@ -49,6 +49,10 @@ li a:hover {
     margin-bottom: 30px;
 }
 
+.component-title {
+    margin-bottom: 25px;
+}
+
 #text-input {
     width: 400px;
     margin-right: 3px;
