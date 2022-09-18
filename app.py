@@ -2,7 +2,6 @@ import dash
 from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
 import plotly.express as px
-from plotly.graph_objs import *
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dash_extensions import EventListener
@@ -40,7 +39,7 @@ app.layout = html.Div([
 
         html.Div([
             html.Div([
-                html.P("Please enter food description:"),
+                html.P("Please enter food description and SELECT search item:"),
                 dcc.Input(
                     id="text-input",
                     type="text",
@@ -63,13 +62,11 @@ app.layout = html.Div([
                     id='nutrient-dropdown-1',
                     options=[{'label': macro, 'value': macro} for macro in macro_list],
                     value='Protein',
-                    # style={'width':'50%'}
                 ),
                 dcc.Dropdown(
                     id='nutrient-dropdown-2',
                     options=[{'label': macro, 'value': macro} for macro in macro_list],
                     value='Carbs',
-                    # style={'width':'50%'}
                 )
             ], style={'width': '20%'}),
             dcc.Graph(
