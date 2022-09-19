@@ -24,6 +24,7 @@ app.layout = html.Div([
     ], className="nav"),
 
     html.Div([
+        html.P(html.I("Serving size of all food items: 100 grams (g). / Macronutrient unit: grams (g).")),
         html.Div([
             html.H6("Top Food Groups per Nutrient", className="component-title"),
             dcc.RadioItems(
